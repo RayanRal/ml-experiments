@@ -30,11 +30,40 @@ def scanD(D, candidateSets, minSupport):
     return retList, supportData
 
 
+def aprioriGen(Lk, k):
+    retList = []
+    lenLk = len(Lk)
+    for i in range(lenLk):
+        for j in range(i+1, lenLk):
+            L1 = list(Lk[i])[:k - 2];
+            L2 = list(Lk[j])[:k - 2]
+            L1.sort();
+            L2.sort()
+            if L1 == L2:
+                retList.append(Lk[i] | Lk[j])
+    return retList
+
+
+def apriori(dataSet, minSupport=0.5):
+    C1 = createC1(dataSet)
+    D = map(set, dataSet)
+    L1, supportData = scanD(D, C1, minSupport)
+    L = [L1]
+    k = 2
+    while (len(L[k-2]) > 0):
+        Ck = aprioriGen(L[k-2], k)
+        Lk, suppK = scanD(D, Ck, minSupport)
+        supportData.update(suppK)
+        L.append(Lk)
+        k += 1
+    return L, supportData
+
+
 dataSet = loadDataSet()
 print dataSet
-C1 = createC1(dataSet)
-print C1
-D = map(set, dataSet)
-print D
-L1, suppData0 = scanD(D, C1, 0.5)
-print L1
+L, suppData = apriori(dataSet)
+print L[0]
+print L[1]
+print L[2]
+print L[3]
+print suppData
